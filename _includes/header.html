@@ -1,0 +1,21 @@
+<header class="site-header">
+  <div class="wrap site-header__inner">
+    <a class="site-title" href="{{ '/' | relative_url }}">
+      <span class="site-title__prompt">~/</span>{{ site.title }}<span class="site-title__caret">█</span>
+    </a>
+
+    <nav class="site-nav">
+      {%- for path in site.nav_pages -%}
+        {%- assign p = site.pages | where: "path", path | first -%}
+        {%- if p -%}
+          <a class="site-nav__link" href="{{ p.url | relative_url }}">{{ p.title | downcase }}</a>
+        {%- endif -%}
+      {%- endfor -%}
+      <a class="site-nav__link" href="{{ '/feed.xml' | relative_url }}">rss</a>
+      <button class="theme-toggle" type="button" aria-label="Toggle color theme" title="Toggle light/dark">
+        <span class="theme-toggle__icon" data-theme-light>[ light ]</span>
+        <span class="theme-toggle__icon" data-theme-dark>[ dark ]</span>
+      </button>
+    </nav>
+  </div>
+</header>
