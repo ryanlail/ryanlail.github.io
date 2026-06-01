@@ -128,6 +128,14 @@ a:hover {
   border-bottom: none;
 }
 .site-nav__link:hover { color: var(--accent); }
+.site-nav__icon {
+  display: inline-flex;
+  align-items: center;
+  color: var(--ink-soft);
+  border-bottom: none;
+}
+.site-nav__icon:hover { color: var(--accent); }
+.site-nav__icon svg { width: 1.15rem; height: 1.15rem; display: block; }
 
 .theme-toggle {
   font-family: var(--font-ui);
@@ -232,8 +240,6 @@ a:hover {
   margin-bottom: 0.75rem;
 }
 .post-header__meta time { color: var(--accent); }
-.post-header__tags { display: flex; gap: 0.6rem; flex-wrap: wrap; }
-.tag { color: var(--ink-soft); }
 
 .post-title {
   font-family: var(--font-serif);
