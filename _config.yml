@@ -5,25 +5,19 @@ description: >-
   Research notes, paper writeups, and occasional thoughts on machine learning
   from Ryan Lail.
 author: Ryan Lail
+github_username: ryanlail
 
-# Build settings
-theme: minima
+# Build settings (custom theme — no theme gem)
 markdown: kramdown
 permalink: /:year/:month/:day/:title/
 
 # kramdown / MathJax friendly
 kramdown:
   math_engine: mathjax
-
-# minima theme options
-minima:
-  skin: classic
-  social_links:
-    - platform: github
-      user_url: "https://github.com/ryanlail"
+  syntax_highlighter: rouge
 
 # Navigation shown in the header
-header_pages:
+nav_pages:
   - about.md
 
 plugins:

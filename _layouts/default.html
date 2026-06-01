@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  {%- comment -%} Set theme before first paint to avoid a flash of the wrong mode {%- endcomment -%}
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('theme');
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var theme = stored || (prefersDark ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {}
+    })();
+  </script>
+
+  {%- seo -%}
+  <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+  {%- feed_meta -%}
+
+  {%- if page.math -%}
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']]
+        }
+      };
+    </script>
+    <script id="MathJax-script" async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  {%- endif -%}
+</head>
+<body>
+  {%- include header.html -%}
+
+  <main class="page-content">
+    <div class="wrap">
+      {{ content }}
+    </div>
+  </main>
+
+  {%- include footer.html -%}
+
+  <script src="{{ '/assets/js/theme-toggle.js' | relative_url }}"></script>
+</body>
+</html>
