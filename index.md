@@ -1,6 +1,6 @@
 ---
 layout: home
-title: Home
+hide_footer: true
 ---
 
 Hi, I'm **Ryan Lail**. I work on machine learning research and use this site to

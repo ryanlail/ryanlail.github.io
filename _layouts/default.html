@@ -17,7 +17,13 @@
     })();
   </script>
 
-  {%- seo -%}
+  {%- comment -%} On the home page, show just the site title in the tab (no "Home | …" / tagline) {%- endcomment -%}
+  {%- if page.url == "/" -%}
+    {%- seo title=false -%}
+    <title>{{ site.title }}</title>
+  {%- else -%}
+    {%- seo -%}
+  {%- endif -%}
   <link rel="icon" href="{{ '/assets/favicon.svg' | relative_url }}" type="image/svg+xml">
   <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
   {%- feed_meta -%}
@@ -44,7 +50,9 @@
     </div>
   </main>
 
+  {%- unless page.hide_footer -%}
   {%- include footer.html -%}
+  {%- endunless -%}
 
   <script src="{{ '/assets/js/theme-toggle.js' | relative_url }}"></script>
 </body>

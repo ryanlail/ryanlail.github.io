@@ -138,19 +138,20 @@ a:hover {
 .site-nav__icon svg { width: 1.15rem; height: 1.15rem; display: block; }
 
 .theme-toggle {
-  font-family: var(--font-ui);
-  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
   background: transparent;
   color: var(--ink-soft);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
-  padding: 0.2rem 0.6rem;
+  border: none;
+  padding: 0;
   cursor: pointer;
   line-height: 1;
-  transition: border-color 0.12s ease, color 0.12s ease;
+  transition: color 0.12s ease;
 }
-.theme-toggle:hover { color: var(--accent); border-color: var(--accent); }
-/* Show only the label for the *other* mode (what you'll switch to) */
+.theme-toggle:hover { color: var(--accent); }
+.theme-toggle__icon { display: inline-flex; align-items: center; }
+.theme-toggle__icon svg { width: 1.15rem; height: 1.15rem; display: block; }
+/* Show only the icon for the *other* mode (what you'll switch to) */
 [data-theme="light"] .theme-toggle__icon[data-theme-light] { display: none; }
 [data-theme="dark"]  .theme-toggle__icon[data-theme-dark]  { display: none; }
 
