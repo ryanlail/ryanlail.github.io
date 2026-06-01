@@ -1,0 +1,40 @@
+# Site settings
+title: Ryan Lail
+tagline: Notes on machine learning research
+description: >-
+  Research notes, paper writeups, and occasional thoughts on machine learning
+  from Ryan Lail.
+author: Ryan Lail
+
+# Build settings
+theme: minima
+markdown: kramdown
+permalink: /:year/:month/:day/:title/
+
+# kramdown / MathJax friendly
+kramdown:
+  math_engine: mathjax
+
+# minima theme options
+minima:
+  skin: classic
+  social_links:
+    - platform: github
+      user_url: "https://github.com/ryanlail"
+
+# Navigation shown in the header
+header_pages:
+  - about.md
+
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+
+# Exclude from the built site
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - vendor
+  - README.md
+  - .sass-cache
+  - .jekyll-cache
