@@ -6,6 +6,8 @@ description: >-
   from Ryan Lail.
 author: Ryan Lail
 github_username: ryanlail
+twitter_username: ryan__lail
+linkedin_username: ryanlail
 
 # Build settings (custom theme — no theme gem)
 markdown: kramdown
@@ -16,9 +18,8 @@ kramdown:
   math_engine: mathjax
   syntax_highlighter: rouge
 
-# Navigation shown in the header
-nav_pages:
-  - about.md
+# Navigation shown in the header (page links; socials are added separately)
+nav_pages: []
 
 plugins:
   - jekyll-feed
