@@ -1,9 +1,10 @@
 # Site settings
 title: Ryan Lail
-tagline: Notes on machine learning research
+tagline: Notes on automated evaluation and machine learning
 description: >-
-  Research notes, paper writeups, and occasional thoughts on machine learning
-  from Ryan Lail.
+  Paper writeups and research notes from Ryan Lail — Founding Engineer at
+  Composo AI, working on automated evaluation: LLM-as-a-judge calibration,
+  uncertainty quantification, and classifier fine-tuning.
 author: Ryan Lail
 github_username: ryanlail
 twitter_username: ryan__lail
