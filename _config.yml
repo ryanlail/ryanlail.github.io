@@ -1,10 +1,11 @@
 # Site settings
 title: Ryan Lail
-tagline: Notes on automated evaluation and machine learning
+tagline: Notes on automated evaluation and AI safety
 description: >-
   Paper writeups and research notes from Ryan Lail — Founding Engineer at
-  Composo AI, working on automated evaluation: LLM-as-a-judge calibration,
-  uncertainty quantification, and classifier fine-tuning.
+  Composo AI, working on automated evaluation (LLM-as-a-judge calibration,
+  uncertainty quantification, classifier fine-tuning) and its connection to
+  AI safety and scalable oversight.
 author: Ryan Lail
 github_username: ryanlail
 twitter_username: ryan__lail
