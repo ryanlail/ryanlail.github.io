@@ -4,7 +4,7 @@ title: "Making LLM judges more reliable without fine-tuning"
 date: 2026-05-29
 tags: [research, llm-as-a-judge, evaluation, icml]
 description: >-
-  How far you can push an LLM judge with drop-in, inference-time changes — no
+  How far you can push an LLM judge with drop-in, inference-time changes and no
   fine-tuning. What worked on RewardBench 2, what surprised me, and where it
   goes next.
 ---
@@ -16,7 +16,7 @@ description: >-
 
 At Composo we spend a lot of time on evaluation: working out whether a model's output is actually any good, at scale, without a person checking every case. The obvious way to improve an evaluator is to fine-tune one, and we were keen to avoid that if we could. Fine-tuning is expensive to run and to maintain, the resulting judge tends not to generalise far beyond the data you trained it on, and it is awkward to fold in the customer-specific context that, in practice, decides what "good" even means for a given task. So the question we started with was a simple one: how far can you push an LLM judge using only drop-in changes at inference time, with no training involved?
 
-The full version of what we found is in a paper, [On Cost-Effective LLM-as-a-Judge Improvement Techniques](https://arxiv.org/abs/2604.13717), which we are presenting as posters at two ICML 2026 workshops: the Workshop on Statistical Frameworks for Uncertainty in Agentic Systems, and the Workshop on Combining Theory and Benchmarks. This is the shorter, less formal version: what we tried, what surprised me, and where I think it goes next. All the numbers and detail are in the paper, and the [code is on GitHub](https://github.com/composo-ai/llm-judge-criteria-ensembling).
+The full version of what we found is in a paper, [On Cost-Effective LLM-as-a-Judge Improvement Techniques](https://arxiv.org/abs/2604.13717), which was accepted at two ICML 2026 workshops. This is the shorter, less formal version: what we tried, what surprised me, and where I think it goes next. All the numbers and detail are in the paper, and the [code is on GitHub](https://github.com/composo-ai/llm-judge-criteria-ensembling).
 
 ## The idea
 
@@ -55,4 +55,4 @@ It is also the part that feels like it matters beyond our own eval problem. As w
 
 ---
 
-I'll be at **ICML in Seoul this July**. If you'll be around and want to talk evaluation, judge reliability, or where this goes next, I'd love to chat — reach me on [LinkedIn](https://www.linkedin.com/in/ryanlail/) or [X](https://x.com/ryan__lail).
+I'll be at **ICML in Seoul this July**. If you'll be around and want to talk evaluation, judge reliability, or where this goes next, I'd love to chat. Reach me on [LinkedIn](https://www.linkedin.com/in/ryanlail/) or [X](https://x.com/ryan__lail).
