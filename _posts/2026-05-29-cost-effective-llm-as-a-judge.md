@@ -16,7 +16,7 @@ description: >-
 
 At Composo we spend a lot of time on evaluation: working out whether a model's output is actually any good, at scale, without a person checking every case. The obvious way to improve an evaluator is to fine-tune one, and we were keen to avoid that if we could. Fine-tuning is expensive to run and to maintain, the resulting judge tends not to generalise far beyond the data you trained it on, and it is awkward to fold in the customer-specific context that, in practice, decides what "good" even means for a given task. So the question we started with was a simple one: how far can you push an LLM judge using only drop-in changes at inference time, with no training involved?
 
-The full version of what we found is in a paper, [On Cost-Effective LLM-as-a-Judge Improvement Techniques](https://arxiv.org/abs/2604.13717), which was accepted at two ICML 2026 workshops. This is the shorter, less formal version: what we tried, what surprised me, and where I think it goes next. All the numbers and detail are in the paper, and the [code is on GitHub](https://github.com/composo-ai/llm-judge-criteria-ensembling).
+The full version of what we found is in a paper, [On Cost-Effective LLM-as-a-Judge Improvement Techniques](https://arxiv.org/abs/2604.13717), which we'll be presenting at the ICML 2026 Workshop on Statistical Frameworks for Uncertainty in Agentic Systems. This is the shorter, less formal version: what we tried, what surprised me, and where I think it goes next. All the numbers and detail are in the paper, and the [code is on GitHub](https://github.com/composo-ai/llm-judge-criteria-ensembling).
 
 ## The idea
 
