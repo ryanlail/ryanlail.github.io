@@ -1,179 +1,58 @@
 ---
 layout: post
-title: "Making LLM Judges Better Without Fine-Tuning: A Writeup of Our ICML Paper"
+title: "Making LLM judges more reliable without fine-tuning"
 date: 2026-05-29
 tags: [research, llm-as-a-judge, evaluation, icml]
-math: true
 description: >-
-  A writeup of "On Cost-Effective LLM-as-a-Judge Improvement Techniques" — which
-  drop-in tricks actually move the needle on RewardBench 2, and which don't.
+  How far you can push an LLM judge with drop-in, inference-time changes — no
+  fine-tuning. What worked on RewardBench 2, what surprised me, and where it
+  goes next.
 ---
-
-I'm excited to share that our paper, **"On Cost-Effective LLM-as-a-Judge
-Improvement Techniques"** (joint work with Luke Markham at Composo AI), is
-heading to **ICML**. This post is a writeup: the short version up top, and a
-more technical walkthrough below for anyone who wants the details.
 
 - 📄 Paper: [arXiv:2604.13717](https://arxiv.org/abs/2604.13717)
 - 💻 Code & data: [composo-ai/llm-judge-criteria-ensembling](https://github.com/composo-ai/llm-judge-criteria-ensembling)
 
 ---
 
-## The short version
+At Composo we spend a lot of time on evaluation: working out whether a model's output is actually any good, at scale, without a person checking every case. The obvious way to improve an evaluator is to fine-tune one, and we were keen to avoid that if we could. Fine-tuning is expensive to run and to maintain, the resulting judge tends not to generalise far beyond the data you trained it on, and it is awkward to fold in the customer-specific context that, in practice, decides what "good" even means for a given task. So the question we started with was a simple one: how far can you push an LLM judge using only drop-in changes at inference time, with no training involved?
 
-Using a language model to *score* or *rank* other models' outputs —
-"LLM-as-a-Judge" — has quietly become the dominant approach to automated
-evaluation. It shows up in RLHF reward signals, in benchmarking, in offline
-test suites that gate releases, and in real-time monitors that watch for
-regressions in production. The catch is that an LLM judge is a **noisy,
-stochastic** instrument: ask it twice and you can get two different scores.
+The full version of what we found is in a paper, [On Cost-Effective LLM-as-a-Judge Improvement Techniques](https://arxiv.org/abs/2604.13717), which we are presenting as posters at two ICML 2026 workshops: the Workshop on Statistical Frameworks for Uncertainty in Agentic Systems, and the Workshop on Combining Theory and Benchmarks. This is the shorter, less formal version: what we tried, what surprised me, and where I think it goes next. All the numbers and detail are in the paper, and the [code is on GitHub](https://github.com/composo-ai/llm-judge-criteria-ensembling).
 
-There's a long menu of folk techniques for making judges more reliable —
-ensembling, fancier prompts, calibration, routing hard cases to bigger models.
-But which actually help, and which are just expensive? We ran a controlled study
-on **RewardBench 2** to find out, testing four drop-in techniques (no
-fine-tuning, no new models) across model tiers and two providers.
+## The idea
 
-The headline result: **two cheap, drop-in techniques do almost all the work.**
+The starting point was something that is slightly obvious and slightly not. When an LLM generates text, it is sampling from a distribution, and everyone is comfortable with that. When an LLM judges something, say giving a response a score out of 10, it is also sampling from a distribution, and that feels much less front of mind. Ask the same judge the same thing twice and you will often get two different scores.
 
-- **Task-specific criteria injection** — telling the judge what to look for on
-  *this* category instead of generic "is it helpful?" prompts — gives
-  **+3.0pp at essentially zero extra cost**.
-- **Ensemble scoring** — averaging several independent judgments — gives
-  **+9.8pp** (at the full model, ~5× cost).
-- Together they reach **up to 85.8% accuracy, +13.5pp over a 71.7% baseline —
-  and, crucially, at just 1.3× baseline cost**, because the peak comes from a
-  *small* model that's ensembled and given good criteria.
+Once you take that seriously, a lot of what looks like "the judge is unreliable" starts to look more like "the judge is noisy". Any single score is one draw from a distribution, and we tend to read far too much into that one draw. That reframing is really what motivated the techniques we tested. If the core problem is noise, then the fixes should be about controlling noise rather than trying to make the judge cleverer.
 
-The slightly contrarian finding: **calibration context and adaptive model
-escalation also beat the baseline, but they're dominated** by criteria +
-ensembling on the cost–accuracy frontier. Once you're averaging enough samples,
-the residual noise is small enough that these extra interventions stop adding
-signal. The practical recipe is boring and cheap: **write task-specific
-criteria, ensemble a handful of samples, and prefer a small model with more
-samples over a big model with fewer.**
+## What we tried
 
----
+We tested four drop-in techniques on RewardBench 2, each coming at that noise idea from a different angle:
 
-## The technical version
+- **Ensembling**: ask for several independent scores and average them. More draws, less noise.
+- **Task-specific criteria**: add a single sentence to the prompt saying what actually matters for that category, for example correct reasoning for maths, or appropriate refusal for safety. Close to free.
+- **Calibration context**: show the judge a previously scored example to anchor its sense of the scale. This was aimed squarely at the well-known anchoring problem.
+- **Adaptive escalation**: use a cheap model by default and only call an expensive one when the cheap model looks uncertain.
 
-### Framing: a judge is a noise source
+The headline is that the two cheapest things, criteria and ensembling, did almost all of the work. Together they took accuracy from roughly 72% to 84% on the full-size model, and none of the cleverer methods beat that combination once you account for cost.
 
-The unifying lens of the paper is to treat the judge as a **stochastic scoring
-function** and read each technique as a form of *noise control*:
+## What surprised me
 
-- **Ensembling** is Monte Carlo averaging over per-call noise. If a single
-  judgment is the true score plus zero-mean noise, averaging $k$ independent
-  calls shrinks the variance of the estimate as $1/k$:
+A few of the results caught me out.
 
-  $$\operatorname{Var}\!\left(\frac{1}{k}\sum_{j=1}^{k} s_{ij}\right) = \frac{\sigma_i^2}{k}.$$
+The first is that a small model, given a large ensemble and the criteria prompt, scored higher than any of the big models did. A mini model (Haiku 4.5) at eight samples with criteria reached 85.8%, above every full-size configuration we ran, and at roughly a quarter of the cost. The instinct to reach for the biggest model on the hardest judgements turns out to be the wrong one here. Averaging a lot of cheap, noisy opinions beat one expensive, careful one.
 
-  That's why returns diminish — most of the gain is captured by $k=3$; beyond
-  that you pay linearly for little.
+The second is the anchoring result. Anchoring, where a judge's score drifts depending on what it has just seen, is something people talk about a great deal, and calibration context was our attempt to address it head on. It helped a little when we were taking a single sample. But once we were ensembling, it added essentially nothing: the ensemble had already removed the noise the calibration trick was targeting. The careful, targeted prompt was beaten by simply sampling a few more times and averaging. I think that is a useful reminder that the obvious-sounding fix is not always the one that pays off.
 
-- **Criteria injection** doesn't change per-response variance (mean
-  $\sigma_i$ = 0.31 vs 0.32; KS $p$ = 0.88) — instead it sharpens *between-response
-  discrimination*, so the same noise is less likely to flip the ranking.
+The third, and the one I keep coming back to, is where the gains actually landed. The biggest jumps were in the hardest categories. Maths, which the base judge was fairly weak at, improved a lot from nothing more than the one-sentence criterion. Precise instruction-following, which is brutally hard in every setup we tried, recovered a long way once criteria and ensembling were combined. The cheap interventions helped most exactly where the judge was weakest, which is close to the opposite of what I would have predicted.
 
-- **Per-response score variance** is itself a weak but measurable *uncertainty
-  signal* (AUC ≈ 0.60 for predicting an incorrect judgment).
+## Where this goes next
 
-### Setup
+The thing I am most interested in is a limitation of what we did. Ensembling here averages many samples from the same model. That cancels noise, but it does not cancel bias. Every sample comes from the same model with the same blind spots, so a confident, consistent mistake stays exactly that, and averaging more of them does not help.
 
-We evaluate on **RewardBench 2 (RB2)**, on the 1,753 examples spanning five
-categories — Factuality, Focus, Math, Precise IF, and Safety — after excluding
-the Ties subset. Each example gives a query and **four** candidate responses
-(response 0 is always correct); the judge assigns each an integer score from 1
-to 10, and we count an example correct only if the *unique* highest-mean
-response is the right one (any tie counts as wrong — a deliberately conservative
-rule that punishes judges that can't discriminate).
+The direction I find interesting is combining estimators that are chosen to have different biases, so their errors are less correlated and the averaging cancels something other than just variance. That points towards decomposing what a judge is doing into parts that fail in different ways, rather than treating the score as a single opaque number. There is some nice work on decomposing LLM and judge errors along these lines ([AISI work on decomposing LLM errors](https://www.aisi.gov.uk/blog/llm-judges-on-trial-a-new-statistical-framework-to-assess-autograders), and [the "hot mess of AI" piece](https://alignment.anthropic.com/2026/hot-mess-of-ai/)) that I would like to build on.
 
-We test across three capability classes — **full** (Claude Sonnet 4.6, GPT-5.4),
-**mini** (Claude Haiku 4.5, GPT-5.4 mini), and **nano** (GPT-5.4 nano) — and
-report **cost as a ratio** to the baseline (full model, $k$=1), since absolute
-API prices are vendor- and time-specific.
-
-### What worked
-
-| Condition | Best model | Accuracy | Cost | Δ vs base |
-|---|---|---|---|---|
-| Baseline (full, k=1) | GPT-5.4 | 71.7% | 1.0× | — |
-| + Criteria (full, k=1) | GPT-5.4 | 74.7% | 1.1× | **+3.0pp** |
-| + Ensemble (full, k=8) | GPT-5.4 | 81.5% | 5.0× | **+9.8pp** |
-| + Criteria + ensemble (full, k=8) | GPT-5.4 | 83.6% | 5.3× | +11.9pp |
-| **+ Criteria + ensemble (mini, k=8)** | **Haiku 4.5** | **85.8%** | **1.3×** | **+13.5pp** |
-
-Two things stand out:
-
-1. **Criteria injection is nearly free.** It only adds a one-sentence,
-   category-aware instruction to the prompt (e.g. for Math: *"Focus on whether
-   the mathematical reasoning is logically valid, the steps are correct, and the
-   final answer is accurate"*). On the full model that's +3.0pp at $k$=1 — and
-   the criteria were committed to the repo *before* the first data-collection run
-   to rule out post-hoc tuning. The gains concentrate in Math (+12.0pp) and
-   Safety (+3.3pp).
-
-2. **Small models benefit disproportionately from ensembling.** The absolute
-   $k$=1 → $k$=8 gain grows as base capability falls: +9.8pp (full), +14.4pp
-   (mini), +19.1pp (nano). The upshot is that **mini + criteria at $k$=8 matches
-   full-model ensembling at roughly one-quarter the cost**, and the overall peak
-   (85.8%) is a *mini*-class result. Ensembling raises a weak model's floor, not
-   its ceiling, though — nano $k$=8 still trails mini $k$=8 by ~8pp.
-
-The tie rate tells the variance-reduction story cleanly: ensembling collapses it
-from 20.4% ($k$=1) to 4.5% ($k$=8), and adding criteria pushes it to 3.2%.
-
-### What didn't (reliably) work
-
-This is the part worth internalizing. Several popular ideas beat the raw
-baseline but were **dominated** by criteria + ensembling at comparable cost:
-
-- **Calibration context** — injecting a previously-scored reference example to
-  anchor the judge's scale. Helps +1–2pp at $k$=1 (the "low" anchor, showing a
-  known-*bad* example, slightly beats "high"; cross-category works as well as
-  within-category, so it's general scale-anchoring, not transfer). But at $k$=8
-  it's a **no-op** (within ±0.2pp of plain ensembling): the ensemble has already
-  removed the noise that calibration was suppressing.
-- **Adaptive model escalation** — routing high-variance responses to the big
-  model. Hard variance routing has a large "dead zone" (escalating *some* but
-  not all responses rarely changes the four-way winner), so useful operating
-  points collapse to the cheap or expensive extremes. **Soft blending** looked
-  good in-sample (83.2%) but failed to generalize (80.2% on held-out test, below
-  full $k$=8's 81.5% — midpoint overfitting). Variance-informed ensembling at a
-  low budget (74.9%) is dominated by mini $k$=8 (79.2% at 1.2×).
-- **Stacking everything** — the combined condition (criteria + calibration +
-  dual-model ensembling) reached 82.6% at 6.8× cost, *below* criteria $k$=8 alone
-  (83.6% at 5.3×). The interventions are substitutes, not complements, once
-  variance is already low.
-
-A nice practitioner aside: even at **temperature 0**, $k$=8 beats $k$=1 by
-+4.6pp (CIs non-overlapping) — temp-0 isn't actually deterministic in practice
-(GPU floating-point non-determinism, no seed parameter), so even "deterministic"
-deployments benefit from ensembling.
-
-### Generalization
-
-The findings replicate across both **OpenAI GPT** and **Anthropic Claude**
-families, which suggests these are properties of the LLM-as-a-Judge setup itself
-rather than quirks of one provider.
+It is also the part that feels like it matters beyond our own eval problem. As we lean more heavily on models to check the outputs of other models, the reliability of the judge becomes the reliability of the whole oversight process. Getting trustworthy signal out of imperfect judges is worth caring about for reasons well past a benchmark score.
 
 ---
 
-## Takeaways for practitioners
-
-If you run LLM judges in a research pipeline or in production:
-
-1. **Write task-specific criteria.** Highest return-on-effort change available,
-   essentially free.
-2. **Ensemble a few samples** ($k$≈3–8 — most of the gain is at $k$=3).
-3. **Prefer a small model with more samples** over a big model with fewer; it's
-   often cheaper *and* more accurate.
-4. **Be skeptical of calibration and routing** as accuracy boosters — measure
-   them against this simple baseline before paying for them.
-
-If you'll be at **ICML**, come say hi — I'd love to talk about evaluation, judge
-reliability, and where this goes next.
-
-*Full ablations, per-category CIs, prompts, and escalation analyses are in the
-[paper](https://arxiv.org/abs/2604.13717) and
-[repository](https://github.com/composo-ai/llm-judge-criteria-ensembling).*
+I'll be at **ICML in Seoul this July**. If you'll be around and want to talk evaluation, judge reliability, or where this goes next, I'd love to chat — reach me on [LinkedIn](https://www.linkedin.com/in/ryanlail/) or [X](https://x.com/ryan__lail).
