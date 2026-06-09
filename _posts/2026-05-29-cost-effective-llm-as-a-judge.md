@@ -11,6 +11,7 @@ subtitle: "Improving RewardBench2 performance by 13.5%"
 
 - 📄 Paper: [arXiv:2604.13717](https://arxiv.org/abs/2604.13717)
 - 💻 Code & data: [composo-ai/llm-judge-criteria-ensembling](https://github.com/composo-ai/llm-judge-criteria-ensembling)
+- 📍 Venue: [ICML 2026 Workshop on Statistical Frameworks for Uncertainty in Agentic Systems](https://agentic-uncertainty-icml2026.github.io/)
 
 ---
 
