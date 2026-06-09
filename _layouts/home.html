@@ -15,7 +15,9 @@ layout: default
         <time class="post-list__date" datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y-%m-%d" }}</time>
         <span class="post-list__title">{{ post.title | escape }}</span>
       </a>
-      {%- if post.description -%}
+      {%- if post.subtitle -%}
+      <p class="post-list__excerpt">{{ post.subtitle | strip_html | truncate: 180 }}</p>
+      {%- elsif post.description -%}
       <p class="post-list__excerpt">{{ post.description | strip_html | truncate: 180 }}</p>
       {%- endif -%}
     </li>
