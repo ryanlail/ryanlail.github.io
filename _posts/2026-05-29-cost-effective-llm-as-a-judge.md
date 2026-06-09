@@ -4,9 +4,9 @@ title: "Making LLM judges more reliable without fine-tuning"
 date: 2026-05-29
 tags: [research, llm-as-a-judge, evaluation, icml]
 description: >-
-  How far you can push an LLM judge using only frontier models and inference-time
-  changes, what that buys for scaling oversight, and where it goes next.
-subtitle: "Improving RewardBench2 performance by 13.5pp"
+  Improving RewardBench 2 performance by 13.5pp; accepted at the ICML 2026
+  Workshop "Statistical Frameworks for Uncertainty in Agentic Systems"
+subtitle: 'Improving RewardBench 2 performance by 13.5pp; accepted at the ICML 2026 Workshop "Statistical Frameworks for Uncertainty in Agentic Systems"'
 ---
 
 - 📄 Paper: [arXiv:2604.13717](https://arxiv.org/abs/2604.13717)
