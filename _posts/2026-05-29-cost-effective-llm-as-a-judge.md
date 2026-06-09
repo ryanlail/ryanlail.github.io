@@ -6,7 +6,7 @@ tags: [research, llm-as-a-judge, evaluation, icml]
 description: >-
   How far you can push an LLM judge using only frontier models and inference-time
   changes, what that buys for scaling oversight, and where it goes next.
-subtitle: "Improving RewardBench2 performance by 13.5%"
+subtitle: "Improving RewardBench2 performance by 13.5pp"
 ---
 
 - 📄 Paper: [arXiv:2604.13717](https://arxiv.org/abs/2604.13717)
