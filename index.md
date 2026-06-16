@@ -8,6 +8,6 @@ Hi, I'm Ryan, a Founding Engineer at [Composo AI](https://composo.ai) in London.
 I use this site to write up papers I've worked on and think through research in progress.
 
 
-Working on similar problems? Reach me at [LinkedIn](https://www.linkedin.com/in/ryanlail/) · [X](https://x.com/ryan__lail)  
+Working on similar problems? Reach me at [X](https://x.com/ryan__lail) · [LinkedIn](https://www.linkedin.com/in/ryanlail/)  
 
  
