@@ -7,8 +7,12 @@ description: >-
   Most LLM-judge errors survive resampling, so a disagreement-based detector
   cannot see them. That ceiling on detection tightens as judges get stronger
   and is tightest on Safety.
-subtitle: "A single judge's errors are mostly stable under its own resampling — a hard ceiling on disagreement-based detection that tightens as judges get stronger and is worst on Safety."
+subtitle: "When an LLM judge is wrong, does its own resample disagreement know?"
 math: true
+---
+
+- 💻 Code & data: [ryanlail/does-the-judge-know](https://github.com/ryanlail/does-the-judge-know)
+
 ---
 
 When an LLM judge makes a wrong safety decision, does its own uncertainty know? Under the bias–variance decomposition, errors are either variance errors that are detectable by resampling, or bias errors where the judge is confidently and repeatably wrong. We find it is mostly the latter on frontier judges. Wrong answers are usually stable under resampling, the same wrong winner returns when you re-draw the scores. GPT-5.4's errors are 70% stable across all categories and 86% stable on Safety, so a disagreement-based detector can catch at most 14% of its Safety errors. We show there is a ceiling on what single-judge disagreement can catch, and it falls as judge models get stronger, with the effect strongest on Safety.
